@@ -86,7 +86,7 @@ class Robot:
         estado = "encendido" if self.encendido else "apagado"
         return f"Robot {self.nombre} | Batería: {self.bateria}% | Estado: {estado}"
 
-    # Nuevo método 1: cargar batería
+    # Nuevo  1: cargar batería
     def cargar_bateria(self, cantidad):
         """
         Recarga la batería del robot.
@@ -94,21 +94,12 @@ class Robot:
         self.bateria = min(100, self.bateria + cantidad)
         print(f"{self.nombre} ha sido cargado. Batería actual: {self.bateria}%")
 
-    # Nuevo método 2: saludar
+    # Nuevo 2: saludar
     def saludar(self):
         """
         Hace que el robot salude.
         """
         print(f"Hola, soy {self.nombre} y estoy listo para servirte.")
-
-# Creamos un objeto (instancia) de la clase Robot
-robot1 = Robot("R2D2", bateria=80)
-
-# Usamos sus métodos
-print(robot1.describir())   # Muestra la información inicial
-robot1.encender()           # Cambia el estado a encendido
-print(robot1.describir())   # Ahora debe mostrar "encendido"
-robot1.apagar()             # Cambia el estado a apagado
 
 # Definimos una subclase que hereda de Robot
 class RobotMovil(Robot):
@@ -141,29 +132,23 @@ class RobotMovil(Robot):
         return (f"RobotMovil {self.nombre} | Posición: ({self.x}, {self.y}) | "
                 f"Batería: {self.bateria}% | Estado: {estado}")
 
-# Creamos un objeto de tipo RobotMovil
+# Creamos objetos de las clases Robot y RobotMovil
+robot1 = Robot("R2D2", bateria=80)
 robot2 = RobotMovil("Wall-E", bateria=50)
-
-print(robot2.describir())  # Muestra la información inicial
-robot2.encender()          # Encendemos el robot
-robot2.mover(2, 3)         # Lo movemos en el plano
-print(robot2.describir())  # Ahora debe mostrar la nueva posición y batería
-
-# Creamos dos nuevos robots de la clase Robot
 robot3 = Robot("Robocop", bateria=70)
 robot4 = Robot("Robot IIE", bateria=90)
 
-# Probamos los nuevos métodos en los robots nuevos
-robot3.saludar()
-robot3.cargar_bateria(20)
-
-robot4.saludar()
-robot4.encender()
-print(robot4.describir())
-
-# Creamos una lista con robots de distintos tipos
+# Lista con todos los robots
 robots = [robot1, robot2, robot3, robot4]
 
-# Recorremos la lista y llamamos al mismo método 'describir'
+# Hacemos que todos pasen por lo mismo
 for r in robots:
-    print(r.describir())  # Cada objeto responde según su clase
+    print(r.describir())   # Muestra la información inicial
+    r.encender()           # Encendemos el robot
+    # Si el robot tiene método mover (es RobotMovil) lo movemos
+    if isinstance(r, RobotMovil):
+        r.mover(2, 3)
+    r.saludar()            # Saluda
+    r.cargar_bateria(20)   # Carga batería
+    print(r.describir())   # Muestra el estado final
+    r.apagar()             # Lo apagamos
