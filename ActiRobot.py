@@ -52,7 +52,7 @@ PROGRAMACIÓN ORIENTADA A OBJETOS (POO)
     ├─ __repr__: depuración
     └─ __eq__: comparación de objetos
   
-""""  
+"""
 # Definimos la clase base 'Robot'
 class Robot:
     """
@@ -67,9 +67,6 @@ class Robot:
         self.bateria = bateria
         # Estado inicial: apagado
         self.encendido = False
-        # 🔹 NUEVOS ATRIBUTOS:
-        self.modelo = "Genérico"   # atributo nuevo
-        self.version = "1.0"       # atributo nuevo
 
     def encender(self):
         # Solo puede encenderse si hay batería
@@ -88,6 +85,21 @@ class Robot:
         # Devuelve un texto con la información del robot
         estado = "encendido" if self.encendido else "apagado"
         return f"Robot {self.nombre} | Batería: {self.bateria}% | Estado: {estado}"
+
+    # Nuevo método 1: cargar batería
+    def cargar_bateria(self, cantidad):
+        """
+        Recarga la batería del robot.
+        """
+        self.bateria = min(100, self.bateria + cantidad)
+        print(f"{self.nombre} ha sido cargado. Batería actual: {self.bateria}%")
+
+    # Nuevo método 2: saludar
+    def saludar(self):
+        """
+        Hace que el robot salude.
+        """
+        print(f"Hola, soy {self.nombre} y estoy listo para servirte.")
 
 # Creamos un objeto (instancia) de la clase Robot
 robot1 = Robot("R2D2", bateria=80)
@@ -137,9 +149,17 @@ robot2.encender()          # Encendemos el robot
 robot2.mover(2, 3)         # Lo movemos en el plano
 print(robot2.describir())  # Ahora debe mostrar la nueva posición y batería
 
-# 🔹 NUEVOS ROBOTS CREADOS IGUAL QUE R2D2 Y WALL-E
+# Creamos dos nuevos robots de la clase Robot
 robot3 = Robot("Robocop", bateria=70)
 robot4 = Robot("Robot IIE", bateria=90)
+
+# Probamos los nuevos métodos en los robots nuevos
+robot3.saludar()
+robot3.cargar_bateria(20)
+
+robot4.saludar()
+robot4.encender()
+print(robot4.describir())
 
 # Creamos una lista con robots de distintos tipos
 robots = [robot1, robot2, robot3, robot4]
