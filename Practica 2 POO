@@ -1,0 +1,162 @@
+"""
+Proyecto: Simulación de Dispositivos IoT
+Descripción:
+Este programa simula una red básica de dispositivos IoT utilizando Programación Orientada a Objetos.
+Incluye sensores y actuadores que interactúan entre sí mediante lectura de valores simulados.
+"""
+
+import random
+import time
+
+
+# ------------------------------
+# Clase base: DispositivoIoT
+# ------------------------------
+class DispositivoIoT:
+    """Clase base que representa un dispositivo IoT genérico."""
+
+    def __init__(self, id_dispositivo):
+        self.__id_dispositivo = id_dispositivo
+        self.__estado = False  # False = apagado, True = encendido
+
+    # --- Encapsulamiento con getters/setters ---
+    @property
+    def id_dispositivo(self):
+        return self.__id_dispositivo
+
+    @property
+    def estado(self):
+        return self.__estado
+
+    def encender(self):
+        """Cambia el estado del dispositivo a encendido."""
+        self.__estado = True
+        print(f"[{self.__id_dispositivo}] Dispositivo encendido.")
+
+    def apagar(self):
+        """Cambia el estado del dispositivo a apagado."""
+        self.__estado = False
+        print(f"[{self.__id_dispositivo}] Dispositivo apagado.")
+
+    def mostrar_datos(self):
+        """Muestra información básica del dispositivo."""
+        estado_str = "Encendido" if self.__estado else "Apagado"
+        print(f"ID: {self.__id_dispositivo} | Estado: {estado_str}")
+
+
+# ------------------------------
+# Subclase: SensorTemperatura
+# ------------------------------
+class SensorTemperatura(DispositivoIoT):
+    """Sensor que mide la temperatura ambiente."""
+
+    def __init__(self, id_dispositivo):
+        super().__init__(id_dispositivo)
+        self.__temperatura = 0.0
+
+    @property
+    def temperatura(self):
+        return self.__temperatura
+
+    def leer_temperatura(self):
+        """Simula la lectura de temperatura entre 15°C y 40°C."""
+        self.__temperatura = round(random.uniform(15, 40), 2)
+
+    def mostrar_datos(self):
+        """Muestra información del sensor de temperatura."""
+        estado_str = "Encendido" if self.estado else "Apagado"
+        print(f"[SensorTemperatura] ID: {self.id_dispositivo} | Estado: {estado_str} | Temperatura: {self.__temperatura} °C")
+
+
+# ------------------------------
+# Subclase: SensorHumedad
+# ------------------------------
+class SensorHumedad(DispositivoIoT):
+    """Sensor que mide el nivel de humedad."""
+
+    def __init__(self, id_dispositivo):
+        super().__init__(id_dispositivo)
+        self.__humedad = 0.0
+
+    @property
+    def humedad(self):
+        return self.__humedad
+
+    def leer_humedad(self):
+        """Simula la lectura de humedad entre 20% y 90%."""
+        self.__humedad = round(random.uniform(20, 90), 2)
+
+    def mostrar_datos(self):
+        """Muestra información del sensor de humedad."""
+        estado_str = "Encendido" if self.estado else "Apagado"
+        print(f"[SensorHumedad] ID: {self.id_dispositivo} | Estado: {estado_str} | Humedad: {self.__humedad} %")
+
+
+# ------------------------------
+# Subclase: ActuadorLuz
+# ------------------------------
+class ActuadorLuz(DispositivoIoT):
+    """Actuador que controla la intensidad de una luz."""
+
+    def __init__(self, id_dispositivo):
+        super().__init__(id_dispositivo)
+        self.__intensidad = 0  # 0–100 %
+
+    @property
+    def intensidad(self):
+        return self.__intensidad
+
+    def ajustar_intensidad(self, valor):
+        """Ajusta la intensidad de la luz (0–100%)."""
+        if 0 <= valor <= 100:
+            self.__intensidad = valor
+            print(f"[{self.id_dispositivo}] Intensidad ajustada a {self.__intensidad}%")
+        else:
+            print("Valor fuera de rango (0–100).")
+
+    def mostrar_datos(self):
+        """Muestra información del actuador de luz."""
+        estado_str = "Encendido" if self.estado else "Apagado"
+        print(f"[ActuadorLuz] ID: {self.id_dispositivo} | Estado: {estado_str} | Intensidad: {self.__intensidad}%")
+
+
+# ------------------------------
+# Simulación de monitoreo IoT
+# ------------------------------
+if __name__ == "__main__":
+    # Crear objetos de diferentes tipos
+    temp1 = SensorTemperatura("Temp-01")
+    temp2 = SensorTemperatura("Temp-02")
+    hum1 = SensorHumedad("Hum-01")
+    hum2 = SensorHumedad("Hum-02")
+    luz1 = ActuadorLuz("Luz-01")
+
+    # Encender todos los dispositivos
+    for dispositivo in [temp1, temp2, hum1, hum2, luz1]:
+        dispositivo.encender()
+
+    dispositivos = [temp1, temp2, hum1, hum2, luz1]
+
+    # Ciclo de monitoreo simulado
+    print("\n--- INICIANDO CICLO DE MONITOREO ---\n")
+
+    for _ in range(5):  # Repetir 5 ciclos de monitoreo
+        temp1.leer_temperatura()
+        temp2.leer_temperatura()
+        hum1.leer_humedad()
+        hum2.leer_humedad()
+
+        # Lógica de respuesta del actuador
+        if temp1.temperatura > 30 or temp2.temperatura > 30:
+            luz1.encender()
+            luz1.ajustar_intensidad(80)
+        else:
+            luz1.apagar()
+
+        print("\n--- Datos del sistema ---")
+        for d in dispositivos:
+            d.mostrar_datos()
+
+        time.sleep(2)
+
+    print("\n--- FIN DEL MONITOREO ---")
