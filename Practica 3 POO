@@ -1,0 +1,195 @@
+"""
+Proyecto: Sistema de Casa Inteligente
+ALUMNOS: AARON RAMIREZ LOPEZ, JAFET GUEVARA GUEVARA, HIGUEREDO BRAVO JESUS
+Descripción:
+Este programa implementa un sistema de casa inteligente utilizando clases, herencia y composición.
+Incluye una clase abstracta base "Dispositivo" y tres subclases concretas:
+LuzInteligente, CamaraSeguridad y SensorMovimiento.
+
+Además, se define una clase "CasaInteligente" que administra múltiples dispositivos,
+permitiendo simular escenarios automáticos (como encender luces al detectar movimiento).
+"""
+
+from abc import ABC, abstractmethod
+
+# ===========================================================
+# CLASE ABSTRACTA
+# ===========================================================
+class Dispositivo(ABC):
+    """
+    Clase abstracta que representa un dispositivo genérico.
+    """
+
+    def __init__(self, id_dispositivo):
+        self.__id_dispositivo = id_dispositivo
+        self.__estado = False  # False = apagado, True = encendido
+
+    # Métodos getter y setter
+    @property
+    def id_dispositivo(self):
+        return self.__id_dispositivo
+
+    @property
+    def estado(self):
+        return self.__estado
+
+    def encender(self):
+        self.__estado = True
+        print(f" {self.__class__.__name__} [{self.id_dispositivo}] encendido.")
+
+    def apagar(self):
+        self.__estado = False
+        print(f" {self.__class__.__name__} [{self.id_dispositivo}] apagado.")
+
+    @abstractmethod
+    def mostrar_datos(self):
+        """Método abstracto para mostrar los datos específicos del dispositivo."""
+        pass
+
+
+# ===========================================================
+# SUBCLASE 1: LUZ INTELIGENTE
+# ===========================================================
+class LuzInteligente(Dispositivo):
+    def __init__(self, id_dispositivo, intensidad=0):
+        super().__init__(id_dispositivo)
+        self.intensidad = intensidad  # Valor entre 0 y 100
+
+    def ajustar_intensidad(self, valor):
+        self.intensidad = max(0, min(100, valor))
+        print(f" Intensidad ajustada a {self.intensidad}% en luz [{self.id_dispositivo}]")
+
+    def mostrar_datos(self):
+        estado = "Encendida" if self.estado else "Apagada"
+        print(f"LuzInteligente [{self.id_dispositivo}] - Estado: {estado}, Intensidad: {self.intensidad}%")
+
+
+# ===========================================================
+# SUBCLASE 2: CÁMARA DE SEGURIDAD
+# ===========================================================
+class CamaraSeguridad(Dispositivo):
+    def __init__(self, id_dispositivo):
+        super().__init__(id_dispositivo)
+        self.grabando = False
+
+    def iniciar_grabacion(self):
+        if self.estado:
+            self.grabando = True
+            print(f" Cámara [{self.id_dispositivo}] está grabando.")
+        else:
+            print(f" Cámara [{self.id_dispositivo}] apagada. No puede grabar.")
+
+    def detener_grabacion(self):
+        self.grabando = False
+        print(f" Cámara [{self.id_dispositivo}] dejó de grabar.")
+
+    def mostrar_datos(self):
+        estado = "Encendida" if self.estado else "Apagada"
+        grabando = "Sí" if self.grabando else "No"
+        print(f"CamaraSeguridad [{self.id_dispositivo}] - Estado: {estado}, Grabando: {grabando}")
+
+
+# ===========================================================
+# SUBCLASE 3: SENSOR DE MOVIMIENTO
+# ===========================================================
+class SensorMovimiento(Dispositivo):
+    def __init__(self, id_dispositivo):
+        super().__init__(id_dispositivo)
+        self.movimiento_detectado = False
+
+    def detectar_movimiento(self, valor):
+        self.movimiento_detectado = valor
+        estado = "detectado" if valor else "sin movimiento"
+        print(f" Sensor [{self.id_dispositivo}]: {estado}")
+
+    def mostrar_datos(self):
+        estado = "Encendido" if self.estado else "Apagado"
+        movimiento = "Sí" if self.movimiento_detectado else "No"
+        print(f"SensorMovimiento [{self.id_dispositivo}] - Estado: {estado}, Movimiento: {movimiento}")
+
+
+# ===========================================================
+# CLASE CASA INTELIGENTE (Composición)
+# ===========================================================
+class CasaInteligente:
+    """
+    Esta clase agrupa y gestiona múltiples dispositivos inteligentes.
+    """
+
+    def __init__(self):
+        self.dispositivos = []
+
+    def agregar_dispositivo(self, dispositivo):
+        self.dispositivos.append(dispositivo)
+        print(f" Dispositivo agregado: {dispositivo.__class__.__name__} [{dispositivo.id_dispositivo}]")
+
+    def mostrar_todos(self):
+        print("\n Estado de todos los dispositivos:")
+        for d in self.dispositivos:
+            d.mostrar_datos()
+
+    def ejecutar_escena(self):
+        """
+        Escenario automático:
+        Si algún sensor detecta movimiento → encender luces y activar cámaras.
+        """
+        print("\n Ejecutando escena automática...")
+        movimiento_detectado = any(
+            isinstance(d, SensorMovimiento) and d.movimiento_detectado for d in self.dispositivos
+        )
+
+        if movimiento_detectado:
+            print(" Movimiento detectado → Encendiendo luces y cámaras.")
+            for d in self.dispositivos:
+                if isinstance(d, LuzInteligente):
+                    d.encender()
+                    d.ajustar_intensidad(100)
+                elif isinstance(d, CamaraSeguridad):
+                    d.encender()
+                    d.iniciar_grabacion()
+        else:
+            print(" Sin movimiento → apagando luces y cámaras.")
+            for d in self.dispositivos:
+                if isinstance(d, LuzInteligente) or isinstance(d, CamaraSeguridad):
+                    d.apagar()
+
+
+# ===========================================================
+# SIMULACIÓN PRINCIPAL
+# ===========================================================
+if __name__ == "__main__":
+    # Crear casa
+    casa = CasaInteligente()
+
+    # Crear dispositivos
+    luz1 = LuzInteligente("L1", 50)
+    luz2 = LuzInteligente("L2", 30)
+    cam1 = CamaraSeguridad("C1")
+    sensor1 = SensorMovimiento("S1")
+    sensor2 = SensorMovimiento("S2")
+
+    # Agregar dispositivos a la casa
+    casa.agregar_dispositivo(luz1)
+    casa.agregar_dispositivo(luz2)
+    casa.agregar_dispositivo(cam1)
+    casa.agregar_dispositivo(sensor1)
+    casa.agregar_dispositivo(sensor2)
+
+    # Encender dispositivos base
+    luz1.encender()
+    cam1.encender()
+    sensor1.encender()
+    sensor2.encender()
+
+    # Simular movimiento
+    sensor1.detectar_movimiento(True)
+    sensor2.detectar_movimiento(False)
+
+    # Mostrar datos actuales
+    casa.mostrar_todos()
+
+    # Ejecutar escena automática
+    casa.ejecutar_escena()
+
+    # Mostrar datos actualizados
+    casa.mostrar_todos()
